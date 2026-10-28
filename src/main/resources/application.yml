@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: credit-event-pipeline
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+    consumer:
+      group-id: credit-profile-builder
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # ErrorHandlingDeserializer turns an unreadable message into an error the error handler can dead-letter,
+      # instead of making the consumer fail on the same message forever.
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.value.default.type: com.shivemn.ccp.model.CreditEvent
+        spring.json.use.type.headers: false
+        spring.json.trusted.packages: com.shivemn.ccp.model
+
+pipeline:
+  topic: credit-events
+  partitions: 3
+  consumer-concurrency: 3
+  limits:
+    # Largest batch one request may publish, so a shared public link cannot be used to flood the app.
+    max-generate: 100000
+  replay:
+    # Loan dataset replayed by the dashboard's "Replay loan data" button. Lending Club column names.
+    # The bundled file is made-up sample data. See the README to use the real public dataset.
+    file: data/loans-sample.csv
+    borrower-pool: 5000
+  ignite:
+    instance-name: ccp-node
+    # Write profiles to disk (folder below) so they survive a restart. Delete the folder to start fresh.
+    persistence-enabled: true
+    work-dir: ignite-data
+    discovery-port: 47500
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: credit-event-pipeline

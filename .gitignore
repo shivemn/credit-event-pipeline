@@ -1,0 +1,18 @@
+target/
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# React dashboard
+dashboard/node_modules/
+dashboard/dist/
+src/main/resources/static/app/
+
+# Ignite on-disk data
+ignite-data/
+
+# Real loan datasets for replay are large; only the made-up sample is committed
+data/*.csv
+!data/loans-sample.csv
+data/*.gz

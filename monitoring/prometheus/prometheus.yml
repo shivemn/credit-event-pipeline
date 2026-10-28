@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: credit-event-pipeline
+    metrics_path: /actuator/prometheus
+    static_configs:
+      # The Spring Boot app runs on your machine, not in Docker, so Prometheus reaches it through
+      # host.docker.internal.
+      - targets: ["host.docker.internal:8080"]
