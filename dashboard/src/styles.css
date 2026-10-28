@@ -268,3 +268,12 @@ footer a { color: var(--accent); font-weight: 600; }
 .replay h3 { margin: 0 0 4px; }
 .replay p { margin: 0 0 12px; font-size: 14px; }
 .replay .note { margin: 12px 0 0; font-size: 13px; opacity: .8; }
+
+/* PostgreSQL archive and history */
+.history { margin-top: 14px; }
+.history .note, .archive .note { margin: 4px 0 12px; font-size: 14px; color: var(--muted); }
+.history th.num, .history td.num { text-align: right; }
+.archive { display: flex; flex-wrap: wrap; gap: 20px 40px; align-items: center; justify-content: space-between; }
+.archive-count b { display: block; font: 600 40px var(--display); font-variant-numeric: tabular-nums; }
+.archive-count span { color: var(--muted); font-size: 15px; }
+.archive-side { min-width: 240px; }

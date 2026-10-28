@@ -5,9 +5,11 @@ import { useLive } from './hooks/useLive';
 import { usePolling } from './hooks/usePolling';
 import { useRate } from './hooks/useRate';
 import { useHistory } from './hooks/useHistory';
+import { ArchivePanel } from './components/ArchivePanel';
 import { EventFeed } from './components/EventFeed';
 import { FlowDiagram } from './components/FlowDiagram';
 import { Glossary } from './components/Glossary';
+import { HistoryPanel } from './components/HistoryPanel';
 import { HowItWorks } from './components/HowItWorks';
 import { Logo } from './components/Logo';
 import { PartitionLanes } from './components/PartitionLanes';
@@ -37,6 +39,8 @@ export default function App() {
   const recent = live && snapshot ? snapshot.recent : polledRecent;
   const rate = useRate(stats?.processedEvents, stats);
   const history = useHistory(rate);
+  // Whether the PostgreSQL archive is switched on (it is optional on the backend).
+  const { data: archive } = usePolling(api.archive, 3000);
   const [selected, setSelected] = useState<string | null>(null);
 
   const published = stats?.publishedEvents ?? 0;
@@ -158,6 +162,7 @@ export default function App() {
           <div>
             <h3 style={{ marginBottom: 8 }}>Credit file</h3>
             <ProfilePanel borrowerId={selected} onLookup={setSelected} />
+            {archive?.enabled && <HistoryPanel borrowerId={selected} />}
           </div>
         </div>
       </section>
@@ -179,6 +184,8 @@ export default function App() {
           deadLettered={stats?.deadLetteredEvents ?? 0}
         />
       </section>
+
+      <ArchivePanel archive={archive} stored={stats?.archivedEvents} />
 
       <details className="words">
         <summary>Words used on this page</summary>

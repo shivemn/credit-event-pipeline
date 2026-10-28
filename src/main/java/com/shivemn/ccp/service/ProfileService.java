@@ -114,6 +114,11 @@ public class ProfileService {
     public record AtRiskBorrower(String borrowerId, long delayedPayments, long onTimePayments) {
     }
 
+    /** Removes every profile. Used only when rebuilding from the PostgreSQL history. */
+    public void clearAll() {
+        cache.clear();
+    }
+
     public long processedEvents() {
         return processedEvents.get();
     }

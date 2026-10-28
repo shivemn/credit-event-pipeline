@@ -33,6 +33,16 @@ pipeline:
     # The bundled file is made-up sample data. See the README to use the real public dataset.
     file: data/loans-sample.csv
     borrower-pool: 5000
+  archive:
+    # Keep every event permanently in PostgreSQL (started by docker compose). Set to false to run without it.
+    enabled: true
+    jdbc-url: jdbc:postgresql://localhost:5433/ccp
+    username: ccp
+    password: ccp
+    group-id: credit-event-archiver
+  admin:
+    # Lets the dashboard empty Ignite and rebuild it from PostgreSQL. Leave off on a shared link.
+    rebuild-enabled: false
   ignite:
     instance-name: ccp-node
     # Write profiles to disk (folder below) so they survive a restart. Delete the folder to start fresh.

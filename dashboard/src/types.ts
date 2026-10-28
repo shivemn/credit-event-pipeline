@@ -9,6 +9,8 @@ export interface Stats {
   duplicateEvents?: number;
   /** Events moved to the dead-letter topic. Missing on older versions of the backend. */
   deadLetteredEvents?: number;
+  /** Events kept in PostgreSQL. Missing when the archive is switched off. */
+  archivedEvents?: number;
   /** Partition number (as a string key) to events processed. */
   processedPerPartition: Record<string, number>;
 }
@@ -71,4 +73,20 @@ export interface ReplayStatus {
   /** True when the file is the bundled made-up sample rather than a real download. */
   sampleData: boolean;
   error: string | null;
+}
+
+export interface ArchiveStatus {
+  enabled: boolean;
+  storedEvents: number;
+  rebuildAllowed: boolean;
+  rebuild: { running: boolean; replayed: number; error: string | null } | null;
+}
+
+export interface HistoryRow {
+  eventId: string;
+  type: string;
+  amount: number;
+  occurredAtEpochMs: number;
+  partition: number | null;
+  offset: number | null;
 }

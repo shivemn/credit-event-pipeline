@@ -16,6 +16,26 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
 
+  # PostgreSQL: the permanent history of every event. Kafka is the live stream, Ignite the fast copy of each
+  # credit file, and this is the record you can always rebuild them from. Host port 5433 avoids clashing with a
+  # PostgreSQL you may already have on 5432. Local demo password only.
+  postgres:
+    image: postgres:16-alpine
+    container_name: ccp-postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: ccp
+      POSTGRES_USER: ccp
+      POSTGRES_PASSWORD: ccp
+    volumes:
+      - ccp-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ccp -d ccp"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   # Prometheus: collects the app's metrics every 5 seconds and stores them as time series.
   prometheus:
     image: prom/prometheus:v2.54.1
@@ -43,3 +63,6 @@ services:
       - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
     depends_on:
       - prometheus
+
+volumes:
+  ccp-pgdata:

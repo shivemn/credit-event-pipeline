@@ -1,4 +1,4 @@
-import type { Analytics, Profile, RecentEvent, ReplayStatus, Stats } from './types';
+import type { Analytics, ArchiveStatus, HistoryRow, Profile, RecentEvent, ReplayStatus, Stats } from './types';
 
 export class ApiError extends Error {
   status: number;
@@ -22,6 +22,10 @@ export const api = {
   recent: () => getJSON<RecentEvent[]>('/api/recent'),
   topProfiles: (limit: number) => getJSON<Profile[]>(`/api/profiles?limit=${limit}`),
   profile: (borrowerId: string) => getJSON<Profile>(`/api/profiles/${encodeURIComponent(borrowerId)}`),
+  archive: () => getJSON<ArchiveStatus>('/api/archive'),
+  history: (borrowerId: string, limit: number) =>
+    getJSON<HistoryRow[]>(`/api/history/${encodeURIComponent(borrowerId)}?limit=${limit}`),
+  rebuild: () => getJSON<unknown>('/api/archive/rebuild', { method: 'POST' }),
   replayStatus: () => getJSON<ReplayStatus>('/api/replay'),
   startReplay: (rate: number) => getJSON<ReplayStatus>(`/api/replay/start?rate=${rate}`, { method: 'POST' }),
   stopReplay: () => getJSON<ReplayStatus>('/api/replay/stop', { method: 'POST' }),

@@ -36,7 +36,8 @@ import org.springframework.kafka.test.utils.KafkaTestUtils;
         "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",
         "pipeline.ignite.instance-name=ccp-integration-test",
         "pipeline.ignite.persistence-enabled=false",
-        "pipeline.ignite.discovery-port=47600"
+        "pipeline.ignite.discovery-port=47600",
+        "pipeline.archive.enabled=false"
 })
 @EmbeddedKafka(partitions = 3)
 class PipelineIntegrationTest {

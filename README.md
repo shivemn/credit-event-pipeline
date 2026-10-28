@@ -235,3 +235,12 @@ mvn test
 - Persist the cache to a database with Ignite's cache store, or add a second node and show rebalancing.
 - Add Micrometer metrics (events/sec, consumer lag) and a Grafana dashboard.
 - Benchmark consumer concurrency and batch size and record the results here.
+
+## Screenshots
+
+![Live flow diagram](docs/dashboard-1-flow.png)
+![Live numbers and charts](docs/dashboard-2-numbers.png)
+![Credit file totals and people to watch](docs/dashboard-3-files.png)
+![Latest updates filed](docs/dashboard-4-feed.png)
+![Grafana: throughput and latency](docs/grafana-1.png)
+![Grafana: Ignite latency, CPU and threads](docs/grafana-2.png)

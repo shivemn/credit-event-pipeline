@@ -23,6 +23,7 @@
         <!-- Ignite's SQL engine (ignite-indexing) needs this exact H2 version. Spring Boot would otherwise
              manage H2 to 2.x, which breaks it. -->
         <h2.version>1.4.197</h2.version>
+        <flyway.version>10.10.0</flyway.version>
         <!-- Ignite needs these module opens on Java 17+ -->
         <ignite.jvm.args>
             --add-opens=java.base/jdk.internal.access=ALL-UNNAMED
@@ -82,6 +83,26 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
 
+        <!-- PostgreSQL archive of every event (optional, see pipeline.archive.enabled) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -90,6 +111,17 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Starts a real PostgreSQL in Docker for the archive test (skipped when Docker is not running) -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
