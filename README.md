@@ -38,6 +38,9 @@ flowchart LR
     K --> C3[Consumer thread 3]
     C1 & C2 & C3 -->|entry processor| I[(Ignite cache: creditProfiles)]
     I --> R[REST: GET /api/profiles/id]
+    K -->|separate consumer group, batches| A2[Archive consumer]
+    A2 -->|ON CONFLICT DO NOTHING| PG[(PostgreSQL: credit_events)]
+    PG -.->|rebuild| I
 ```
 
 Design points:
@@ -125,6 +128,35 @@ payment timeline are not.
 Build the dashboard (`cd dashboard && npm run build`), start the app, then run
 `cloudflared tunnel --url http://localhost:8080` and share the printed link plus `/app/index.html`. Share only port 8080,
 never Grafana. A single request can publish at most `pipeline.limits.max-generate` events (100,000 by default).
+
+## Permanent history in PostgreSQL
+
+Kafka is the live stream and Ignite holds the fast copy of each credit file, but neither is the permanent record.
+PostgreSQL is: every event is stored there, one row each.
+
+- **A second consumer group** (`credit-event-archiver`) reads the same topic independently, in batches, and writes to
+  PostgreSQL. It has its own place in the topic, so it never slows the consumer that updates Ignite.
+- **Idempotent writes:** `event_id` is the primary key and inserts use `ON CONFLICT DO NOTHING`, so reading a message
+  twice stores it once.
+- **Never skips on failure:** if PostgreSQL is down, the same batch is retried every 2 seconds. Kafka keeps the
+  messages meanwhile, so nothing is lost from the archive.
+- **Schema changes** are versioned SQL files in `src/main/resources/db/migration`, applied by Flyway at start.
+- **Rebuild:** `POST /api/archive/rebuild` empties Ignite and re-applies the whole history in time order. It is off by
+  default because it is destructive; enable it locally with `--pipeline.admin.rebuild-enabled=true`. Stop any replay
+  first, otherwise events arriving during the rebuild can be counted twice.
+- **Switch it off:** `--pipeline.archive.enabled=false` runs the app without PostgreSQL, as before.
+
+| Endpoint | What it returns |
+|---|---|
+| `GET /api/archive` | archive status: events stored, whether rebuild is allowed, rebuild progress |
+| `GET /api/history/{borrowerId}?limit=` | one person's events from PostgreSQL, newest first |
+| `POST /api/archive/rebuild` | rebuild Ignite from PostgreSQL (only when enabled) |
+
+PostgreSQL runs in Docker on host port **5433** (not 5432, to avoid clashing with one you may have installed), database
+`ccp`, user and password `ccp`. These are local demo credentials only. To look inside:
+`docker exec -it ccp-postgres psql -U ccp -d ccp -c "SELECT event_type, count(*) FROM credit_events GROUP BY 1;"`
+
+The test `ArchiveIntegrationTest` starts a real PostgreSQL with Testcontainers. It is skipped when Docker is not running.
 
 ## SQL over the Ignite cache
 
@@ -235,12 +267,3 @@ mvn test
 - Persist the cache to a database with Ignite's cache store, or add a second node and show rebalancing.
 - Add Micrometer metrics (events/sec, consumer lag) and a Grafana dashboard.
 - Benchmark consumer concurrency and batch size and record the results here.
-
-## Screenshots
-
-![Live flow diagram](docs/dashboard-1-flow.png)
-![Live numbers and charts](docs/dashboard-2-numbers.png)
-![Credit file totals and people to watch](docs/dashboard-3-files.png)
-![Latest updates filed](docs/dashboard-4-feed.png)
-![Grafana: throughput and latency](docs/grafana-1.png)
-![Grafana: Ignite latency, CPU and threads](docs/grafana-2.png)
