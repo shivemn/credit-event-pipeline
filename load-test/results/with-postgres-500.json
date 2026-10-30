@@ -1,0 +1,13 @@
+{
+  "label": "with-postgres-500",
+  "offeredPerSecond": 500,
+  "eventsSent": 100000,
+  "achievedPerSecond": 489,
+  "peakLag": 0,
+  "drainSeconds": 0,
+  "p50ms": 0.31416767488151665,
+  "p95ms": 2.6351903032786863,
+  "p99ms": 15.070707367647158,
+  "rejectedRequests": 0,
+  "timedOut": false
+}

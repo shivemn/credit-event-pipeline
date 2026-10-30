@@ -1,0 +1,13 @@
+{
+  "label": "3-partitions-2000",
+  "offeredPerSecond": 2000,
+  "eventsSent": 100000,
+  "achievedPerSecond": 1991,
+  "peakLag": 0,
+  "drainSeconds": 0,
+  "p50ms": 0.3045317789699571,
+  "p95ms": 0.6689110845986985,
+  "p99ms": 1.3623541250000026,
+  "rejectedRequests": 0,
+  "timedOut": false
+}

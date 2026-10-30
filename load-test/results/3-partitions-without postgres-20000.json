@@ -1,0 +1,13 @@
+{
+  "label": "3-partitions-without postgres-20000",
+  "offeredPerSecond": 20000,
+  "eventsSent": 100000,
+  "achievedPerSecond": 7723,
+  "peakLag": 0,
+  "drainSeconds": 7.599,
+  "p50ms": 0.14617500504880512,
+  "p95ms": 0.43415860450860205,
+  "p99ms": 0.7651241388888904,
+  "rejectedRequests": 0,
+  "timedOut": false
+}

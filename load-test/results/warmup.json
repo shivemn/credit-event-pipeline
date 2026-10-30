@@ -1,0 +1,13 @@
+{
+  "label": "warmup",
+  "offeredPerSecond": 2000,
+  "eventsSent": 20000,
+  "achievedPerSecond": 1980,
+  "peakLag": 0,
+  "drainSeconds": 0,
+  "p50ms": 0.41000841456350845,
+  "p95ms": 3.3528519259259237,
+  "p99ms": 15.285905266666646,
+  "rejectedRequests": 0,
+  "timedOut": false
+}

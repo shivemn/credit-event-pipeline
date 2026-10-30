@@ -1,0 +1,13 @@
+{
+  "label": "check",
+  "offeredPerSecond": 20000,
+  "eventsSent": 100000,
+  "achievedPerSecond": 5070,
+  "peakLag": 0,
+  "drainSeconds": 14.027,
+  "p50ms": 0.16223499934167215,
+  "p95ms": 0.733960085106382,
+  "p99ms": 3.100986800000014,
+  "rejectedRequests": 0,
+  "timedOut": false
+}

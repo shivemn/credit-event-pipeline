@@ -1,0 +1,13 @@
+{
+  "label": "smoke",
+  "offeredPerSecond": 500,
+  "eventsSent": 50000,
+  "achievedPerSecond": 503,
+  "peakLag": 0,
+  "drainSeconds": 0,
+  "p50ms": 0.38318955330578514,
+  "p95ms": 2.105163034383955,
+  "p99ms": 9.831808032258037,
+  "rejectedRequests": 0,
+  "timedOut": false
+}

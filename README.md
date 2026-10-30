@@ -123,6 +123,44 @@ by hashing the loan id; and it has no payment history, so payments are inferred 
 (Fully Paid gives on-time payments, Charged Off gives delayed ones). The loans are real; the borrower grouping and the
 payment timeline are not.
 
+## Looking inside the system
+
+Once `docker compose up -d` is running:
+
+| What | Link |
+|---|---|
+| Dashboard (development) | http://localhost:5173/app/ |
+| Kafka UI: topics, messages, partitions, dead-letter topic, consumer groups and lag | http://localhost:8085 |
+| Grafana: throughput, latency, consumer lag | http://localhost:3000/d/credit-pipeline |
+| Prometheus targets | http://localhost:9090/targets |
+
+**Consumer lag** is read from Kafka itself (latest offset minus the group's committed offset, per partition) by
+`LagMonitor`, shown on the dashboard and charted in Grafana as `pipeline_consumer_lag`.
+
+**Sharing a public link safely.** `RateLimitFilter` limits each visitor to 300,000 generated events and 20 replay or
+rebuild starts per minute, and replay speed is capped at 5,000 events a second. Over the limit the API returns
+HTTP 429 and the dashboard shows a message. Change these in `application.yml` under `pipeline.limits`.
+
+## Load testing
+
+`load-test/` holds a [k6](https://k6.io) test that sends events at a chosen rate and reports achieved throughput, peak
+consumer lag, catch-up time and the p50/p95/p99 time to apply one event (read from Prometheus). It also has a sweep
+script and a guide for three experiments: the maximum rate, the cost of the PostgreSQL archive, and one partition
+compared with three. See `load-test/README.md`.
+
+## Try breaking it
+
+The dashboard has three buttons that break the pipeline on purpose, so the safety nets can be watched working
+(`ChaosService`, endpoints under `POST /api/chaos/`):
+
+| Button | What it does | What you should see |
+|---|---|---|
+| Send the same update twice | publishes one event twice with the same ID | "repeats ignored" goes up by one |
+| Send a broken message | publishes text that is not valid JSON | "set aside" goes up by one, and the message appears in the `credit-events.DLT` topic in Kafka UI |
+| Pause the workers | pauses the main consumer group for 15 seconds | consumer lag climbs while updates keep arriving, then drains; the PostgreSQL archive keeps running because it is a different group |
+
+Switch them off with `pipeline.chaos.enabled=false`. They count towards the per-minute action limit above.
+
 ## Sharing a live demo
 
 Build the dashboard (`cd dashboard && npm run build`), start the app, then run
